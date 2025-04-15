@@ -6,20 +6,20 @@ const VideoPage = () => {
 
   const videos = [
     {
+      title: 'Telling Time For Children - Learning the Clock',
+      url: 'https://www.youtube.com/embed/h6RNkQ7lU8Y',
+      description: 'An engaging introduction for kids on how to read analog clocks.',
+    },
+    {
       title: 'How to Tell Time on an Analog Clock',
-      url: 'https://www.youtube.com/embed/HrxZWNu72WI',
-      description: 'Basic explanation of how to read an analog clock for kids.'
+      url: 'https://www.youtube.com/embed/3Posbu-VKxU',
+      description: 'Basic explanation of how to read an analog clock for kids.',
     },
     {
-      title: 'Learn to Tell Time',
-      url: 'https://www.youtube.com/embed/8RJzoyIVzV8',
-      description: 'A fun animated lesson on telling time using a clock.'
+      title: 'Learn to Tell Time - Animated Clock Lesson',
+      url: 'https://www.youtube.com/embed/g6tJAy_7AL4',
+      description: 'A fun animated lesson on telling time using a clock.',
     },
-    {
-      title: 'Telling Time for Beginners',
-      url: 'https://www.youtube.com/embed/pdzk57g0mGU',
-      description: 'Beginner-friendly video that teaches children how to read the hour and minute hands.'
-    }
   ];
 
   return (
@@ -37,11 +37,10 @@ const VideoPage = () => {
           <div key={index} className="shadow rounded-lg overflow-hidden bg-white p-4">
             <div className="mb-2 aspect-w-16 aspect-h-9">
               <iframe
-                className="w-full h-full"
+                className="w-full h-full rounded"
                 src={video.url}
                 title={video.title}
                 loading="lazy"
-                aria-label={`Video about ${video.title}`}
                 allowFullScreen
               ></iframe>
             </div>
