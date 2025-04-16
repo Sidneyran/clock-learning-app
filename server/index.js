@@ -11,7 +11,14 @@ console.log('🛠 Loading environment variables...');
 
 // Middleware
 console.log('🛠 Loading middleware...');
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
+app.options('*', cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 🔧 确保表单也能解析
 
@@ -24,16 +31,20 @@ app.use((req, res, next) => {
 
 // Routes
 console.log('🔁 Mounting /api/auth routes...');
-const authRoutes = require('./routes/auth');
-app.use('/api/auth', authRoutes); // ✅ 放在中间件之后，app.listen()之前
-console.log('✅ /api/auth routes mounted');
+let authRoutes;
+try {
+  authRoutes = require('./routes/auth');
+  app.use('/api/auth', authRoutes);
+  console.log('✅ /api/auth routes mounted');
+} catch (err) {
+  console.error('❌ Failed to load /api/auth routes:', err.message);
+}
 
-const authMiddleware = require('./middleware/auth');
+// const authMiddleware = require('./middleware/auth');
 
-// 受保护的 GET 路由示例
-app.get('/api/protected', authMiddleware, (req, res) => {
-  res.status(200).json({ message: '✅ You are authorized!', user: req.user });
-});
+// app.get('/api/protected', authMiddleware, (req, res) => {
+//   res.status(200).json({ message: '✅ You are authorized!', user: req.user });
+// });
 
 // Direct test POST route
 app.post('/test-direct', (req, res) => {

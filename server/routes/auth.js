@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ strict: true });
 const bcrypt = require('bcryptjs');
 const User = require('../models/User'); // 确保你有这个模型
 const jwt = require('jsonwebtoken');
@@ -14,7 +14,8 @@ router.post('/register', async (req, res) => {
   console.log('📥 Received request to /register');
   console.log('Body:', req.body);
 
-  const { username, email, password } = req.body;
+  const { name, email, password } = req.body;
+  const username = name;
 
   if (!username || !email || !password) {
     console.log('❌ Missing fields');
@@ -22,6 +23,12 @@ router.post('/register', async (req, res) => {
   }
 
   try {
+    // 检查用户名是否已存在
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(409).json({ message: 'Username already in use' });
+    }
+
     // 检查用户是否已存在
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -51,7 +58,7 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Registration error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
@@ -68,24 +75,17 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    // 检查用户是否存在
+    // 检查用户是否存在并验证密码
     const user = await User.findOne({ email });
-    if (!user) {
-      console.log('❌ User not found');
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    // 验证密码
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      console.log('❌ Password mismatch');
-      return res.status(401).json({ message: 'Invalid credentials' });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      console.log('❌ Invalid login attempt');
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     // 生成 JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email },
-      process.env.JWT_SECRET || 'secretkey',
+      process.env.JWT_SECRET || 'secretkey', // 建议在 .env 中设置 JWT_SECRET
       { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
     );
 

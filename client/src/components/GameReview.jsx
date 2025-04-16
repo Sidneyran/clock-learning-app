@@ -1,14 +1,53 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 const GameReview = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const results = location.state?.results || [];
+  const results =
+    location.state?.results ||
+    JSON.parse(localStorage.getItem('latest_game_results') || '[]');
 
   const correctCount = results.filter(r => r.correct).length;
   const accuracy = results.length > 0 ? ((correctCount / results.length) * 100).toFixed(1) : '0.0';
+
+  useEffect(() => {
+    if (results.length === 0) return;
+
+    const correctCount = results.filter(r => r.correct).length;
+    const accuracy = correctCount / results.length;
+    const avgTime = results.reduce((sum, r) => sum + (r.timeTaken || 0), 0) / results.length;
+    const attempts = results.length;
+    const lastLevel = results[results.length - 1]?.level || 1;
+
+    fetch('http://localhost:5000/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accuracy,
+        avg_time: avgTime,
+        attempts,
+        last_level: lastLevel
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.recommended_level !== undefined) {
+          console.log('保存推荐等级：', data.recommended_level);
+          localStorage.setItem('recommended_level', data.recommended_level);
+        }
+      })
+      .catch(err => console.error('Error fetching recommendation:', err));
+  }, [results]);
+
+  if (results.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-600 text-lg">
+        No review data found. Please complete a game first.
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-blue-50 p-6">
