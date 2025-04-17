@@ -13,11 +13,13 @@ console.log('🛠 Loading environment variables...');
 console.log('🛠 Loading middleware...');
 app.use(cors({
   origin: 'http://localhost:3000',
-  credentials: true
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
 }));
 app.options('*', cors({
   origin: 'http://localhost:3000',
-  credentials: true
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // 🔧 确保表单也能解析

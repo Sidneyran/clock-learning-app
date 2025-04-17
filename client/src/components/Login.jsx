@@ -1,12 +1,12 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -15,15 +15,24 @@ const Login = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const res = await fetch('http://localhost:5050/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
 
       const data = await res.json();
+      console.log('Login response:', res.status, data);
       if (res.ok && data.token) {
-        login(data.token); // 触发 context 登录
+        if (authContext && authContext.setAuthData) {
+          authContext.setAuthData(data); // 设置登录状态
+          localStorage.setItem('user', JSON.stringify(data.user || {}));
+          localStorage.setItem('token', data.token);
+        } else {
+          console.error('setAuthData is not available in AuthContext');
+          alert('Something went wrong: AuthContext misconfigured.');
+          return;
+        }
         alert('Login successful!');
         navigate('/home'); // Redirect to homepage
       } else {
@@ -31,7 +40,7 @@ const Login = () => {
       }
     } catch (err) {
       console.error(err);
-      alert('Something went wrong');
+      alert(`Something went wrong: ${err.message}`);
     }
   };
 
@@ -63,9 +72,9 @@ const Login = () => {
           Login
         </button>
         <div className="text-center pt-4">
-          <a href="/" className="text-blue-500 hover:underline text-sm">← Back to Home</a>
+          <Link to="/" className="text-blue-500 hover:underline text-sm">← Back to Home</Link>
           <p className="text-sm mt-2">
-            Don't have an account? <a href="/register" className="text-blue-600 underline">Register</a>
+            Don't have an account? <Link to="/register" className="text-blue-600 underline">Register</Link>
           </p>
         </div>
       </div>

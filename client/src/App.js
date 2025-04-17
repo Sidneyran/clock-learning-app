@@ -14,8 +14,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 
 const PrivateRoute = ({ children }) => {
-  const { user } = React.useContext(AuthContext);
-  return user ? children : <Navigate to="/login" />;
+  const { authData } = React.useContext(AuthContext);
+  return authData?.user ? children : <Navigate to="/login" />;
 };
 
 function App() {
@@ -24,15 +24,15 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/home" />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/login" element={<Navigate to="/home" />} />
-          <Route path="/practice" element={<ClockLearning />} />
+          <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/practice" element={<PrivateRoute><ClockLearning /></PrivateRoute>} />
           <Route path="/videos" element={<VideoPage />} />
-          <Route path="/review" element={<ReviewPage />} />
-          <Route path="/challenge" element={<GameChallenge />} />
+          <Route path="/review" element={<PrivateRoute><ReviewPage /></PrivateRoute>} />
+          <Route path="/challenge" element={<PrivateRoute><GameChallenge /></PrivateRoute>} />
           <Route path="/review-game" element={<PrivateRoute><GameReview /></PrivateRoute>} />
           <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/review-error" element={<ReviewError />} />
+          <Route path="/review-error" element={<PrivateRoute><ReviewError /></PrivateRoute>} />
           <Route path="/register" element={<Register />} />
         </Routes>
       </BrowserRouter>

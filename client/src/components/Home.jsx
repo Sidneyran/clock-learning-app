@@ -4,12 +4,27 @@ import { BookOpenCheck, GraduationCap, Clock, History, Trophy, AlertCircle } fro
 
 const Home = () => {
   const navigate = useNavigate();
+  const [user, setUser] = React.useState(null);
+  
+  React.useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+      console.log('Restored user:', storedUser);
+      const token = localStorage.getItem('token');
+      if (storedUser && token) {
+        const username = storedUser.username || storedUser.name || storedUser.email || 'Guest';
+        setUser({ ...storedUser, username });
+      }
+    } catch (error) {
+      console.error('Failed to restore user:', error);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white px-6 py-12">
       <div className="flex justify-end mb-4">
         <div className="text-sm text-gray-700">
-          Logged in as <strong>{localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).name : 'Guest'}</strong>
+          Logged in as <strong>{user?.username || user?.name || user?.email || 'Guest'}</strong>
           <button
             className="ml-4 px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-xs"
             onClick={() => {
@@ -23,7 +38,7 @@ const Home = () => {
         </div>
       </div>
       <h1 className="text-4xl font-bold text-center text-blue-800 mb-4">Clock Learning App</h1>
-      <p className="text-center text-lg text-gray-700 mb-6">Welcome back, <strong>{localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).name : 'Guest'}</strong>!</p>
+      <p className="text-center text-lg text-gray-700 mb-6">Welcome back, <strong>{user?.username || user?.name || user?.email || 'Guest'}</strong>!</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <div
