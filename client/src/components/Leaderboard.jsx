@@ -2,25 +2,68 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+const Table = ({ data }) => (
+  <div className="max-w-2xl mx-auto bg-white rounded shadow p-4 mb-6">
+    {data.length === 0 ? (
+      <p className="text-center text-gray-500">No scores recorded yet.</p>
+    ) : (
+      <table className="w-full table-auto text-left">
+        <thead>
+          <tr className="text-yellow-800">
+            <th className="px-2 py-2">#</th>
+            <th className="px-2 py-2">Name</th>
+            <th className="px-2 py-2">Accuracy</th>
+            <th className="px-2 py-2">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((entry, index) => (
+            <tr key={index} className="border-t">
+              <td className="px-2 py-1">{index + 1}</td>
+              <td className="px-2 py-1">{entry.username || entry.name}</td>
+              <td className="px-2 py-1">{(entry.accuracy * 100).toFixed(1)}%</td>
+              <td className="px-2 py-1">{new Date(entry.timestamp).toLocaleString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+);
+
 const Leaderboard = () => {
-  const [scores, setScores] = useState([]);
+  const [beginner, setBeginner] = useState([]);
+  const [intermediate, setIntermediate] = useState([]);
+  const [advanced, setAdvanced] = useState([]);
+  const [selectedTab, setSelectedTab] = useState('beginner');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const savedScores = JSON.parse(localStorage.getItem('game_scores')) || [];
-    const sortedScores = savedScores
-      .sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        return b.accuracy - a.accuracy;
-      })
-      .slice(0, 10);
-    setScores(sortedScores);
+    const fetchLeaderboard = async () => {
+      try {
+        const res = await fetch('http://localhost:5050/api/attempts/leaderboard');
+        const data = await res.json();
+        setBeginner(
+          data
+            .filter(e => String(e.level).toLowerCase() === '1' || String(e.level).toLowerCase() === 'beginner')
+            .sort((a, b) => b.accuracy - a.accuracy)
+        );
+        setIntermediate(
+          data
+            .filter(e => String(e.level).toLowerCase() === '2' || String(e.level).toLowerCase() === 'intermediate')
+            .sort((a, b) => b.accuracy - a.accuracy)
+        );
+        setAdvanced(
+          data
+            .filter(e => String(e.level).toLowerCase() === '3' || String(e.level).toLowerCase() === 'advanced')
+            .sort((a, b) => b.accuracy - a.accuracy)
+        );
+      } catch (err) {
+        console.error('Failed to fetch leaderboard data:', err);
+      }
+    };
+    fetchLeaderboard();
   }, []);
-
-  const clearScores = () => {
-    localStorage.removeItem('game_scores');
-    setScores([]);
-  };
 
   return (
     <div className="min-h-screen bg-yellow-50 p-6">
@@ -32,45 +75,24 @@ const Leaderboard = () => {
       </button>
       <h1 className="text-3xl font-bold text-center text-yellow-800 mb-6">🏆 Leaderboard</h1>
 
-      {scores.length === 0 ? (
-        <p className="text-center text-gray-500">No scores recorded yet.</p>
-      ) : (
-        <div className="max-w-2xl mx-auto bg-white rounded shadow p-4">
-          <table className="w-full table-auto text-left">
-            <thead>
-              <tr className="text-yellow-800">
-                <th className="px-2 py-2">#</th>
-                <th className="px-2 py-2">Name</th>
-                <th className="px-2 py-2">Score</th>
-                <th className="px-2 py-2">Accuracy</th>
-                <th className="px-2 py-2">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scores.map((entry, index) => (
-                <tr key={index} className="border-t">
-                  <td className="px-2 py-1">{index + 1}</td>
-                  <td className="px-2 py-1">{entry.name}</td>
-                  <td className="px-2 py-1">{entry.score}</td>
-                  <td className="px-2 py-1">{entry.accuracy}%</td>
-                  <td className="px-2 py-1">{entry.date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {scores.length > 0 && (
-        <div className="text-center mt-6">
+      <div className="flex justify-center space-x-4 mb-6">
+        {['beginner', 'intermediate', 'advanced'].map(level => (
           <button
-            onClick={clearScores}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            key={level}
+            onClick={() => setSelectedTab(level)}
+            className={`px-4 py-2 rounded border ${
+              selectedTab === level
+                ? 'bg-yellow-500 text-white'
+                : 'bg-white text-yellow-700 border-yellow-500'
+            }`}
           >
-            Clear Leaderboard
+            {level.charAt(0).toUpperCase() + level.slice(1)}
           </button>
-        </div>
-      )}
+        ))}
+      </div>
+      {selectedTab === 'beginner' && <Table data={beginner} />}
+      {selectedTab === 'intermediate' && <Table data={intermediate} />}
+      {selectedTab === 'advanced' && <Table data={advanced} />}
     </div>
   );
 };

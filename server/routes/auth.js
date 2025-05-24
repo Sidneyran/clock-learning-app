@@ -83,11 +83,13 @@ router.post('/login', async (req, res) => {
     }
 
     // 生成 JWT token
+    const tokenPayload = { id: user._id, email: user.email, username: user.username };
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      tokenPayload,
       process.env.JWT_SECRET || 'secretkey', // 建议在 .env 中设置 JWT_SECRET
       { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
     );
+    console.log('🔐 Token payload:', tokenPayload);
 
     console.log('✅ Login successful');
     res.status(200).json({
@@ -102,6 +104,19 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('❌ Login error:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Protected test route to verify decoded token
+router.get('/me', (req, res) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'Token missing' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secretkey');
+    return res.status(200).json({ message: '✅ Token valid', user: decoded });
+  } catch (err) {
+    return res.status(401).json({ message: '❌ Token invalid' });
   }
 });
 

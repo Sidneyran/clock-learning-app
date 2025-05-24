@@ -29,15 +29,58 @@ const ClockLearning = () => {
     setVisualTime(newTime);
   };
 
-  const saveRecord = (correct, score) => {
+  const saveRecord = async (correct, score) => {
     const prev = JSON.parse(localStorage.getItem('clock_records')) || [];
-    prev.push({
+    const attempt = {
       timestamp: Date.now(),
       difficulty: level === 1 ? 'Beginner' : level === 2 ? 'Intermediate' : 'Advanced',
       correct,
       score
-    });
+    };
+    prev.push(attempt);
     localStorage.setItem('clock_records', JSON.stringify(prev));
+
+    const token = localStorage.getItem('token');
+    console.log('🔑 token:', token);
+    if (!token) return;
+
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (!storedUser || !storedUser.username || !storedUser.id) {
+      console.warn('Missing username or userId, aborting upload.');
+      return;
+    }
+    const username = storedUser.username || 'Anonymous';
+    const userId = storedUser.id;
+
+    const body = {
+      userId,
+      username,
+      mode: 'practice',
+      level: level === 1 ? 'easy' : level === 2 ? 'medium' : 'hard',
+      score: parseFloat(score),
+      total: totalAttempts + 1,
+      accuracy: Number.isFinite((correctAnswers + (correct ? 1 : 0)) / (totalAttempts + 1)) ? (correctAnswers + (correct ? 1 : 0)) / (totalAttempts + 1) : 0,
+      correct,
+      timeTaken: 0,
+      submittedToLeaderboard: false
+    };
+
+    console.log('📦 Final payload body:', body);
+
+    console.log('🧪 Upload body correct value:', correct);
+    console.log('📤 Uploading attempt:', { level: body.level, score: body.score, total: body.total, accuracy: body.accuracy, correct: body.correct });
+
+    fetch('http://localhost:5050/api/attempts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': token
+      },
+      body: JSON.stringify(body)
+    })
+      .then(res => res.json())
+      .then(data => console.log('✅ Upload success:', data))
+      .catch(err => console.error('❌ Upload failed:', err));
   };
 
   const checkAnswer = () => {
@@ -48,7 +91,8 @@ const ClockLearning = () => {
 
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
-      const newScore = score + 10;
+      let points = level === 1 ? 10 : level === 2 ? 15 : 20;
+      const newScore = score + points;
       setScore(newScore);
       setLevel(Math.floor(newScore / 50) + 1);
       alert('✅ Correct!');

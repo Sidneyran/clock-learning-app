@@ -42,6 +42,10 @@ try {
   console.error('❌ Failed to load /api/auth routes:', err.message);
 }
 
+const attemptsRoutes = require('./routes/attempts');
+app.use('/api/attempts', attemptsRoutes);
+console.log('✅ /api/attempts routes mounted');
+
 // const authMiddleware = require('./middleware/auth');
 
 // app.get('/api/protected', authMiddleware, (req, res) => {
