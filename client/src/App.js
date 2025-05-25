@@ -10,6 +10,7 @@ import GameChallenge from './components/GameChallenge';
 import GameReview from './components/GameReview';
 import Leaderboard from './components/Leaderboard';
 import ReviewError from './components/ReviewError';
+import Profile from './components/profile.jsx';
 import Login from './components/Login';
 import Register from './components/Register';
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="/review-game" element={<PrivateRoute><GameReview /></PrivateRoute>} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/review-error" element={<PrivateRoute><ReviewError /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="/register" element={<Register />} />
         </Routes>
       </BrowserRouter>

@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema({
     required: true,
     minlength: 6
   },
+  correctCount: {
+    type: Number,
+    default: 0
+  },
   createdAt: {
     type: Date,
     default: Date.now

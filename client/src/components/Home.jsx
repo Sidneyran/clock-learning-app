@@ -22,9 +22,18 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white px-6 py-12">
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between items-center max-w-6xl mx-auto mb-6">
+        <div className="bg-white border border-gray-200 px-4 py-2 rounded shadow-sm text-sm text-gray-700">
+          Welcome back, <strong>{user?.username || user?.name || user?.email || 'Guest'}</strong>!
+        </div>
         <div className="text-sm text-gray-700">
           Logged in as <strong>{user?.username || user?.name || user?.email || 'Guest'}</strong>
+          <button
+            className="ml-2 px-3 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 text-xs"
+            onClick={() => navigate('/profile')}
+          >
+            Profile
+          </button>
           <button
             className="ml-4 px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-xs"
             onClick={() => {
@@ -37,8 +46,8 @@ const Home = () => {
           </button>
         </div>
       </div>
-      <h1 className="text-4xl font-bold text-center text-blue-800 mb-4">Clock Learning App</h1>
-      <p className="text-center text-lg text-gray-700 mb-6">Welcome back, <strong>{user?.username || user?.name || user?.email || 'Guest'}</strong>!</p>
+      <h1 className="text-5xl font-bold text-center text-blue-900 mb-2">ClockStar</h1>
+      <p className="text-center text-lg text-gray-600 mb-6 italic">clock learning app for kids</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <div
@@ -65,7 +74,9 @@ const Home = () => {
         >
           <History className="w-12 h-12 mx-auto text-orange-500 mb-4" />
           <h3 className="text-xl font-semibold mb-2">Review Progress</h3>
-          <p className="text-gray-600">Review your past attempts, scores, and improve your skills.</p>
+          <p className="text-gray-600">
+            Review your past attempts, scores, and improve your skills. Ideal for tracking learning history and enabling parental monitoring.
+          </p>
         </div>
 
         <div
@@ -97,7 +108,7 @@ const Home = () => {
       </div>
 
       <footer className="text-center mt-12 text-sm text-gray-500">
-        Built with ❤️ to help children master time telling.
+        Built with ❤️ to help children master time telling — ClockStar.
       </footer>
     </div>
   );

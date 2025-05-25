@@ -23,27 +23,26 @@ const ReviewPage = () => {
         setLoading(true);
         const token = localStorage.getItem('token');
         console.log('Token:', token); // Add this line
-        const response = await fetch('http://localhost:5050/api/attempts?mode=practice', {
+        const response = await fetch('http://localhost:5050/api/attempts', {
           headers: {
-            'x-auth-token': token,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
         const data = await response.json();
-        const saved = data || [];
-        const latest = [...saved].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 20);
-        console.log('Saved Attempts:', saved); // Add this line
+        const practiceOnly = (data || []).filter(item => item.mode === 'practice');
+        const latest = [...practiceOnly].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 20);
         setRecords(latest);
 
-        let total = saved.length;
-        let correct = saved.filter(r => r.score >= r.total / 2).length;
-        let maxScore = Math.max(...saved.map(r => r.score), 0);
-        let latestScore = saved[saved.length - 1]?.score || 0;
+        let total = practiceOnly.length;
+        let correct = practiceOnly.filter(r => r.score >= r.total / 2).length;
+        let maxScore = Math.max(...practiceOnly.map(r => r.score), 0);
+        let latestScore = latest[0]?.score || 0;
 
         setSummary({ total, correct, score: latestScore, maxScore });
 
         setBarData({
-          labels: latest.map((r, i) => `#${saved.length - latest.length + i + 1}`),
+          labels: latest.map((r, i) => `#${practiceOnly.length - latest.length + i + 1}`),
           datasets: [{
             label: 'Score',
             data: latest.map(r => r.score),

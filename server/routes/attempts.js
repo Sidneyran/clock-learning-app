@@ -20,7 +20,12 @@ router.post('/', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'Game mode requires questionDetails' });
     }
 
-    const numericLevel = parseInt(level);
+    let numericLevel;
+    if (typeof level === 'string') {
+      numericLevel = level === 'easy' ? 1 : level === 'medium' ? 2 : level === 'hard' ? 3 : NaN;
+    } else {
+      numericLevel = parseInt(level);
+    }
     if (
       !mode || isNaN(numericLevel) ||
       score === undefined || score === null ||
@@ -91,6 +96,19 @@ router.get('/leaderboard', async (req, res) => {
     res.status(200).json(topScores);
   } catch (err) {
     res.status(500).json({ message: 'Failed to retrieve leaderboard' });
+  }
+});
+
+// @route   DELETE /api/attempts
+// @desc    Delete all attempts for current user
+// @access  Private
+router.delete('/', authMiddleware, async (req, res) => {
+  try {
+    await Attempt.deleteMany({ userId: req.user.id });
+    res.status(200).json({ message: 'All attempts deleted for current user' });
+  } catch (err) {
+    console.error('Error deleting attempts:', err);
+    res.status(500).json({ message: 'Failed to delete attempts' });
   }
 });
 

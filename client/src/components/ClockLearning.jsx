@@ -5,6 +5,38 @@ import 'react-clock/dist/Clock.css';
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 const ClockLearning = () => {
+  const [hour, setHour] = useState(12);
+  const [minute, setMinute] = useState(0);
+  const [targetHour, setTargetHour] = useState(3);
+  const [targetMinute, setTargetMinute] = useState(30);
+  const [second, setSecond] = useState(0);
+  const [targetSecond, setTargetSecond] = useState(0);
+  const [totalAttempts, setTotalAttempts] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [visualTime, setVisualTime] = useState(new Date());
+  const [feedbackMessage, setFeedbackMessage] = useState(null);
+
+  const voiceTimeRef = React.useRef(null);
+
+  const setTimeFromVoice = (h, m, s = 0) => {
+    voiceTimeRef.current = { h, m, s };
+    setHour(h);
+    setMinute(m);
+    setSecond(s);
+  };
+
+  React.useEffect(() => {
+    if (voiceTimeRef.current) {
+      const timer = setTimeout(() => {
+        checkAnswer();
+        voiceTimeRef.current = null;
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [hour, minute, second]);
+
   // Voice recognition function
   const startVoiceRecognition = () => {
     if (!SpeechRecognition) {
@@ -42,14 +74,7 @@ const ClockLearning = () => {
           h = 0; // 12am -> 0
         }
 
-        setHour(h);
-        setMinute(m);
-        if (level === 3) {
-          setSecond(s);
-          setTimeout(() => checkAnswer(), 100); // Slight delay to ensure state update
-        } else {
-          checkAnswer(); // Automatically check the answer after voice input
-        }
+        setTimeFromVoice(h, m, level === 3 ? s : 0);
       } else {
         alert('❌ Could not understand the time format.');
       }
@@ -60,18 +85,6 @@ const ClockLearning = () => {
       alert('❌ Speech recognition error: ' + event.error);
     };
   };
-  const [hour, setHour] = useState(12);
-  const [minute, setMinute] = useState(0);
-  const [targetHour, setTargetHour] = useState(3);
-  const [targetMinute, setTargetMinute] = useState(30);
-  const [second, setSecond] = useState(0);
-  const [targetSecond, setTargetSecond] = useState(0);
-  const [totalAttempts, setTotalAttempts] = useState(0);
-  const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [score, setScore] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [visualTime, setVisualTime] = useState(new Date());
-  const [feedbackMessage, setFeedbackMessage] = useState(null);
 
   const generateRandomTime = () => {
     const randomHour = Math.floor(Math.random() * 24);
@@ -102,6 +115,7 @@ const ClockLearning = () => {
     console.log('🔑 token:', token);
     if (!token) return;
 
+    /*
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (!storedUser || !storedUser.username || !storedUser.id) {
       console.warn('Missing username or userId, aborting upload.');
@@ -109,18 +123,27 @@ const ClockLearning = () => {
     }
     const username = storedUser.username || 'Anonymous';
     const userId = storedUser.id;
+    */
 
     const body = {
-      userId,
-      username,
       mode: 'practice',
       level: level === 1 ? 'easy' : level === 2 ? 'medium' : 'hard',
       score: parseFloat(score),
       total: totalAttempts + 1,
-      accuracy: Number.isFinite((correctAnswers + (correct ? 1 : 0)) / (totalAttempts + 1)) ? (correctAnswers + (correct ? 1 : 0)) / (totalAttempts + 1) : 0,
+      accuracy: Number.isFinite((correctAnswers + (correct ? 1 : 0)) / (totalAttempts + 1))
+        ? (correctAnswers + (correct ? 1 : 0)) / (totalAttempts + 1)
+        : 0,
       correct,
       timeTaken: 0,
-      submittedToLeaderboard: false
+      submittedToLeaderboard: false,
+      questionDetails: {
+        questionHour: targetHour,
+        questionMinute: targetMinute,
+        questionSecond: targetSecond,
+        userHour: hour,
+        userMinute: minute,
+        userSecond: second
+      }
     };
 
     console.log('📦 Final payload body:', body);
@@ -132,7 +155,7 @@ const ClockLearning = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-auth-token': token
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(body)
     })
@@ -149,6 +172,23 @@ const ClockLearning = () => {
 
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
+      // 实时更新等级（每次答对就 +1）
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetch('http://localhost:5050/api/level/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ increment: 1 })
+        })
+          .then(res => res.json())
+          .then(data => {
+            console.log('🌟 Level updated:', data);
+          })
+          .catch(err => console.error('❌ Failed to update level:', err));
+      }
       let points = level === 1 ? 10 : level === 2 ? 15 : 20;
       const newScore = score + points;
       setScore(newScore);
