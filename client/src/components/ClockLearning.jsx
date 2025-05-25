@@ -2,7 +2,64 @@ import React, { useState } from 'react';
 import Clock from 'react-clock';
 import 'react-clock/dist/Clock.css';
 
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
 const ClockLearning = () => {
+  // Voice recognition function
+  const startVoiceRecognition = () => {
+    if (!SpeechRecognition) {
+      alert('Speech Recognition is not supported in this browser.');
+      return;
+    }
+
+    const synth = window.speechSynthesis;
+    const question = new SpeechSynthesisUtterance('What time is it now?');
+    synth.speak(question);
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    question.onend = () => {
+      recognition.start();
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript.trim().toLowerCase();
+      console.log('🗣️ Recognized:', transcript);
+
+      const match = transcript.match(/(\d{1,2})[:\s点时]+(\d{1,2})(?:[:\s分]+(\d{1,2}))?/);
+      if (match) {
+        let h = parseInt(match[1]);
+        const m = parseInt(match[2]);
+        const s = match[3] ? parseInt(match[3]) : 0;
+
+        // Handle AM/PM and convert to 24-hour format
+        if (transcript.includes('p.m') || transcript.includes('pm') || transcript.includes('下午')) {
+          if (h < 12) h += 12;
+        } else if ((transcript.includes('a.m') || transcript.includes('am') || transcript.includes('上午')) && h === 12) {
+          h = 0; // 12am -> 0
+        }
+
+        setHour(h);
+        setMinute(m);
+        if (level === 3) {
+          setSecond(s);
+          setTimeout(() => checkAnswer(), 100); // Slight delay to ensure state update
+        } else {
+          checkAnswer(); // Automatically check the answer after voice input
+        }
+      } else {
+        alert('❌ Could not understand the time format.');
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      alert('❌ Speech recognition error: ' + event.error);
+    };
+  };
   const [hour, setHour] = useState(12);
   const [minute, setMinute] = useState(0);
   const [targetHour, setTargetHour] = useState(3);
@@ -14,6 +71,7 @@ const ClockLearning = () => {
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [visualTime, setVisualTime] = useState(new Date());
+  const [feedbackMessage, setFeedbackMessage] = useState(null);
 
   const generateRandomTime = () => {
     const randomHour = Math.floor(Math.random() * 24);
@@ -95,18 +153,28 @@ const ClockLearning = () => {
       const newScore = score + points;
       setScore(newScore);
       setLevel(Math.floor(newScore / 50) + 1);
-      alert('✅ Correct!');
+      setFeedbackMessage('✅ Correct!');
       generateRandomTime();
       saveRecord(true, newScore);
     } else {
-      alert('❌ Try again!');
+      setFeedbackMessage('❌ Try again!');
       saveRecord(false, score);
     }
+    const synth = window.speechSynthesis;
+    const feedback = new SpeechSynthesisUtterance(isCorrect ? 'Correct!' : 'Try again!');
+    synth.speak(feedback);
   };
 
   React.useEffect(() => {
     generateRandomTime();
   }, []);
+
+  React.useEffect(() => {
+    if (feedbackMessage) {
+      const timer = setTimeout(() => setFeedbackMessage(null), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [feedbackMessage]);
 
   return (
     <div className="text-center mt-10 px-4">
@@ -121,6 +189,12 @@ const ClockLearning = () => {
           {visualTime.getHours() >= 12 ? 'PM' : 'AM'}
         </p>
       </div>
+
+      {feedbackMessage && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border shadow-lg px-10 py-6 rounded-lg text-3xl font-bold text-gray-800 z-50">
+          {feedbackMessage}
+        </div>
+      )}
 
       <div className="flex justify-center my-6">
         <Clock
@@ -195,6 +269,13 @@ const ClockLearning = () => {
         )}
       </div>
 
+      <button
+        onClick={startVoiceRecognition}
+        className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded shadow mb-4"
+      >
+        🎙️ Start Voice Input
+      </button>
+      <br />
       <button
         onClick={checkAnswer}
         className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow"
