@@ -329,6 +329,14 @@ const GameChallenge = () => {
             <ArrowLeft className="mr-1 w-4 h-4" /> Back to Home
           </button>
           <h1 className="text-3xl font-bold text-blue-800 mb-4">🎮 Time Challenge</h1>
+          <div className="mb-3 p-3 bg-yellow-50 border border-yellow-300 rounded-lg shadow-sm text-center max-w-md mx-auto">
+            <p className="text-sm text-yellow-900 font-medium mb-1">
+              🕓 Please answer using <span className="font-semibold">24-hour format</span> (e.g., 13:30 instead of 1:30 PM).
+            </p>
+            <p className="text-sm text-yellow-900">
+              📌 Questions may show AM or PM clocks — be sure to convert correctly to 24-hour time.
+            </p>
+          </div>
           <p className="text-sm text-gray-500 mb-2">
             Question {questionNum} {questionNum <= numQuestions ? 'of ' + numQuestions : ''}
           </p>

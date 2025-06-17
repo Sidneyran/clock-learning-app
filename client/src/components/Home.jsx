@@ -21,7 +21,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white px-6 py-12">
+    <div className="min-h-screen bg-cover bg-center bg-fixed px-6 py-12" style={{ backgroundImage: "url('/assets/image2.png')" }}>
       <div className="flex justify-between items-center max-w-6xl mx-auto mb-6">
         <div className="bg-white border border-gray-200 px-4 py-2 rounded shadow-sm text-sm text-gray-700">
           Welcome back, <strong>{user?.username || user?.name || user?.email || 'Guest'}</strong>!

@@ -217,127 +217,163 @@ const ClockLearning = () => {
   }, [feedbackMessage]);
 
   return (
-    <div className="text-center mt-10 px-4">
-      <div className="mb-4 text-left">
-        <a href="/" className="inline-block bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded">
-          ← Back to Home
-        </a>
-      </div>
-      <div className="bg-blue-50 p-4 rounded-lg shadow mb-4">
-        <h2 className="text-3xl font-bold mb-2">🕒 What time is this?</h2>
-        <p className="text-lg font-semibold text-gray-600">
-          {visualTime.getHours() >= 12 ? 'PM' : 'AM'}
-        </p>
-      </div>
-
-      {feedbackMessage && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border shadow-lg px-10 py-6 rounded-lg text-3xl font-bold text-gray-800 z-50">
-          {feedbackMessage}
-        </div>
-      )}
-
-      <div className="flex justify-center my-6">
-        <Clock
-          value={visualTime}
-          renderNumbers={level === 1}
-          showSecondHand={level === 3}
-        />
-      </div>
-
-      <div className="mb-6 space-x-2">
-        <button
-          onClick={() => setLevel(1)}
-          className={`px-4 py-1 rounded border transition duration-200 ${
-            level === 1 ? 'bg-blue-500 text-white' : 'bg-white border-blue-500 text-blue-500 hover:bg-blue-50'
-          }`}
+    <div
+      style={{
+        backgroundImage: 'url("/assets/clocklearning.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          borderRadius: '16px',
+          padding: '40px',
+          width: '100%',
+          maxWidth: '900px',
+          margin: '40px',
+        }}
+      >
+        <div
+          className="text-center mt-10 px-4"
         >
-          🟦 Beginner
-        </button>
-        <button
-          onClick={() => setLevel(2)}
-          className={`px-4 py-1 rounded border transition duration-200 ${
-            level === 2 ? 'bg-green-500 text-white' : 'bg-white border-green-500 text-green-500 hover:bg-green-50'
-          }`}
-        >
-          🟩 Intermediate
-        </button>
-        <button
-          onClick={() => setLevel(3)}
-          className={`px-4 py-1 rounded border transition duration-200 ${
-            level === 3 ? 'bg-purple-500 text-white' : 'bg-white border-purple-500 text-purple-500 hover:bg-purple-50'
-          }`}
-        >
-          🟪 Advanced
-        </button>
-      </div>
+          <div className="mb-4 text-left">
+            <a href="/" className="inline-block bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded">
+              ← Back to Home
+            </a>
+          </div>
+          <div
+            className="bg-blue-50 p-4 rounded-lg shadow mb-4"
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
+          >
+            <h2 className="text-3xl font-bold mb-2">🕒 What time is this?</h2>
+            <p className="text-lg font-semibold text-gray-600">
+              {visualTime.getHours() >= 12 ? 'PM' : 'AM'}
+            </p>
+          </div>
 
-      <div className="mb-4 flex justify-center items-center gap-4">
-        <div>
-          <label className="block font-semibold">Hour:</label>
-          <input
-            type="number"
-            value={hour}
-            onChange={e => setHour(parseInt(e.target.value))}
-            min="1"
-            max="12"
-            className="border rounded px-2 py-1 w-20 text-center"
-          />
-        </div>
-        <div>
-          <label className="block font-semibold">Minute:</label>
-          <input
-            type="number"
-            value={minute}
-            onChange={e => setMinute(parseInt(e.target.value))}
-            min="0"
-            max="59"
-            className="border rounded px-2 py-1 w-20 text-center"
-          />
-        </div>
-        {level === 3 && (
-          <div>
-            <label className="block font-semibold">Second:</label>
-            <input
-              type="number"
-              value={second}
-              onChange={e => setSecond(parseInt(e.target.value))}
-              min="0"
-              max="59"
-              className="border rounded px-2 py-1 w-20 text-center"
+          {feedbackMessage && (
+            <div
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border shadow-lg px-10 py-6 rounded-lg text-3xl font-bold text-gray-800 z-50"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
+            >
+              {feedbackMessage}
+            </div>
+          )}
+
+          <div className="flex justify-center my-6">
+            <Clock
+              value={visualTime}
+              renderNumbers={level === 1}
+              showSecondHand={level === 3}
             />
           </div>
-        )}
-      </div>
 
-      <button
-        onClick={startVoiceRecognition}
-        className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded shadow mb-4"
-      >
-        🎙️ Start Voice Input
-      </button>
-      <br />
-      <button
-        onClick={checkAnswer}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow"
-      >
-        Check
-      </button>
+          <div className="mb-6 space-x-2">
+            <button
+              onClick={() => setLevel(1)}
+              className={`px-4 py-1 rounded border transition duration-200 ${
+                level === 1 ? 'bg-blue-500 text-white' : 'bg-white border-blue-500 text-blue-500 hover:bg-blue-50'
+              }`}
+            >
+              🟦 Beginner
+            </button>
+            <button
+              onClick={() => setLevel(2)}
+              className={`px-4 py-1 rounded border transition duration-200 ${
+                level === 2 ? 'bg-green-500 text-white' : 'bg-white border-green-500 text-green-500 hover:bg-green-50'
+              }`}
+            >
+              🟩 Intermediate
+            </button>
+            <button
+              onClick={() => setLevel(3)}
+              className={`px-4 py-1 rounded border transition duration-200 ${
+                level === 3 ? 'bg-purple-500 text-white' : 'bg-white border-purple-500 text-purple-500 hover:bg-purple-50'
+              }`}
+            >
+              🟪 Advanced
+            </button>
+          </div>
 
-      <div className="mt-6 space-y-1 text-sm text-gray-700 bg-gray-100 p-4 rounded shadow max-w-md mx-auto">
-        <p>
-          Attempts: {totalAttempts} | Correct: {correctAnswers} | Accuracy:{' '}
-          {totalAttempts > 0 ? ((correctAnswers / totalAttempts) * 100).toFixed(1) : 0}%
-        </p>
-        <p>Score: {score} ⭐</p>
-        <p>Level: {level} 🧠</p>
-        <p>
-          Current Difficulty:{' '}
-          {level === 1
-            ? 'Beginner (with numbers)'
-            : level === 2
-            ? 'Intermediate (no numbers)'
-            : 'Advanced (with second hand)'}
-        </p>
+          <div className="mb-4 flex justify-center items-center gap-4">
+            <div>
+              <label className="block font-semibold">Hour:</label>
+              <input
+                type="number"
+                value={hour}
+                onChange={e => setHour(parseInt(e.target.value))}
+                min="1"
+                max="12"
+                className="border rounded px-2 py-1 w-20 text-center"
+              />
+            </div>
+            <div>
+              <label className="block font-semibold">Minute:</label>
+              <input
+                type="number"
+                value={minute}
+                onChange={e => setMinute(parseInt(e.target.value))}
+                min="0"
+                max="59"
+                className="border rounded px-2 py-1 w-20 text-center"
+              />
+            </div>
+            {level === 3 && (
+              <div>
+                <label className="block font-semibold">Second:</label>
+                <input
+                  type="number"
+                  value={second}
+                  onChange={e => setSecond(parseInt(e.target.value))}
+                  min="0"
+                  max="59"
+                  className="border rounded px-2 py-1 w-20 text-center"
+                />
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={startVoiceRecognition}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded shadow mb-4"
+          >
+            🎙️ Start Voice Input
+          </button>
+          <br />
+          <button
+            onClick={checkAnswer}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow"
+          >
+            Check
+          </button>
+
+          <div
+            className="mt-6 space-y-1 text-sm text-gray-700 p-4 rounded shadow max-w-md mx-auto"
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
+          >
+            <p>
+              Attempts: {totalAttempts} | Correct: {correctAnswers} | Accuracy:{' '}
+              {totalAttempts > 0 ? ((correctAnswers / totalAttempts) * 100).toFixed(1) : 0}%
+            </p>
+            <p>Score: {score} ⭐</p>
+            <p>Level: {level} 🧠</p>
+            <p>
+              Current Difficulty:{' '}
+              {level === 1
+                ? 'Beginner (with numbers)'
+                : level === 2
+                ? 'Intermediate (no numbers)'
+                : 'Advanced (with second hand)'}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

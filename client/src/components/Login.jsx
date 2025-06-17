@@ -45,7 +45,10 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50">
+    <div
+      className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: "url('/assets/login.jpg')" }}
+    >
       <div className="bg-white p-8 rounded shadow-md w-96 space-y-4">
         <h2 className="text-2xl font-bold text-center text-blue-700">👋 Welcome Back! Please Login</h2>
         <p className="text-center text-sm text-gray-600">
