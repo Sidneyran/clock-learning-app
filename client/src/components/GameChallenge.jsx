@@ -260,65 +260,70 @@ const GameChallenge = () => {
   return (
     <>
       {!hasStarted && (
-        <div className="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
-          <button
-            className="absolute top-4 left-4 flex items-center text-sm text-gray-600 hover:text-gray-800"
-            onClick={() => navigate('/')}
-          >
-            <ArrowLeft className="mr-1 w-4 h-4" /> Back to Home
-          </button>
-          <div className="bg-blue-100 p-8 rounded shadow-md max-w-3xl w-full flex flex-col items-center">
-            <h2 className="text-xl font-bold mb-2 text-blue-800">🎮 Game</h2>
-            {recommendedLevel && (
-              <div className="text-sm text-blue-700 mb-6">
-                Recommended for you: {['Beginner', 'Intermediate', 'Advanced'][recommendedLevel - 1]}
+        <div
+          className="min-h-screen bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/assets/game.jpg')" }}
+        >
+          <div className="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
+            <button
+              className="absolute top-4 left-4 flex items-center text-sm text-gray-600 hover:text-gray-800"
+              onClick={() => navigate('/')}
+            >
+              <ArrowLeft className="mr-1 w-4 h-4" /> Back to Home
+            </button>
+            <div className="bg-blue-100 p-8 rounded shadow-md max-w-3xl w-full flex flex-col items-center">
+              <h2 className="text-xl font-bold mb-2 text-blue-800">🎮 Game</h2>
+              {recommendedLevel && (
+                <div className="text-sm text-blue-700 mb-6">
+                  Recommended for you: {['Beginner', 'Intermediate', 'Advanced'][recommendedLevel - 1]}
+                </div>
+              )}
+              <div className="mb-6 w-full flex flex-col items-center">
+                <label className="block mb-1 text-sm font-medium text-gray-700">Number of Questions:</label>
+                <select
+                  value={numQuestions}
+                  onChange={(e) => setNumQuestions(parseInt(e.target.value))}
+                  className="w-40 border border-gray-300 rounded px-3 py-1 mb-2"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={15}>15</option>
+                </select>
               </div>
-            )}
-            <div className="mb-6 w-full flex flex-col items-center">
-              <label className="block mb-1 text-sm font-medium text-gray-700">Number of Questions:</label>
-              <select
-                value={numQuestions}
-                onChange={(e) => setNumQuestions(parseInt(e.target.value))}
-                className="w-40 border border-gray-300 rounded px-3 py-1 mb-2"
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={15}>15</option>
-              </select>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-              {[1, 2, 3].map((level) => {
-                const levelNames = ['Beginner', 'Intermediate', 'Advanced'];
-                const levelColors = ['bg-green-100', 'bg-yellow-100', 'bg-red-100'];
-                const textColors = ['text-green-800', 'text-yellow-800', 'text-red-800'];
-                const desc = [
-                  'Clock with numbers. 30 seconds per question.',
-                  'Clock without numbers. 30 seconds per question.',
-                  'Clock without numbers. Add seconds hand. 30 seconds per question.'
-                ];
-                return (
-                  <div
-                    key={level}
-                    className={`p-6 h-60 rounded shadow-md flex flex-col items-center justify-between ${levelColors[level - 1]} ${textColors[level - 1]} text-center`}
-                  >
-                    <h3 className="text-lg font-semibold mb-2">{levelNames[level - 1]}</h3>
-                    <p className="text-sm mb-4">{desc[level - 1]}</p>
-                    <button
-                      onClick={() => {
-                        setRecommendedLevel(level);
-                        setTimeLimit(30);
-                        setShowHints(level === 1);
-                        setTargetTime(getRandomTime());
-                        setTimeLeft(30);
-                        setHasStarted(true);
-                      }}
-                      className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                {[1, 2, 3].map((level) => {
+                  const levelNames = ['Beginner', 'Intermediate', 'Advanced'];
+                  const levelColors = ['bg-green-100', 'bg-yellow-100', 'bg-red-100'];
+                  const textColors = ['text-green-800', 'text-yellow-800', 'text-red-800'];
+                  const desc = [
+                    'Clock with numbers. 30 seconds per question.',
+                    'Clock without numbers. 30 seconds per question.',
+                    'Clock without numbers. Add seconds hand. 30 seconds per question.'
+                  ];
+                  return (
+                    <div
+                      key={level}
+                      className={`p-6 h-60 rounded shadow-md flex flex-col items-center justify-between ${levelColors[level - 1]} ${textColors[level - 1]} text-center`}
                     >
-                      Start
-                    </button>
-                  </div>
-                );
-              })}
+                      <h3 className="text-lg font-semibold mb-2">{levelNames[level - 1]}</h3>
+                      <p className="text-sm mb-4">{desc[level - 1]}</p>
+                      <button
+                        onClick={() => {
+                          setRecommendedLevel(level);
+                          setTimeLimit(30);
+                          setShowHints(level === 1);
+                          setTargetTime(getRandomTime());
+                          setTimeLeft(30);
+                          setHasStarted(true);
+                        }}
+                        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                      >
+                        Start
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
