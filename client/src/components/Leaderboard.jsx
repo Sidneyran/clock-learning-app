@@ -66,7 +66,12 @@ const Leaderboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-yellow-50 p-6">
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed p-6"
+      style={{
+        backgroundImage: "url('/assets/leaderboard.png')",
+      }}
+    >
       <button
         onClick={() => navigate('/')}
         className="mb-4 flex items-center text-gray-700 hover:text-gray-900"
