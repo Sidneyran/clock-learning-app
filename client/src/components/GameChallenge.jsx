@@ -430,6 +430,9 @@ const GameChallenge = () => {
                 <p className="text-sm text-gray-600 mb-6">
                   Accuracy: {((results.filter(r => r.correct).length / results.length) * 100).toFixed(1)}%
                 </p>
+                <p className="text-xs text-red-500 mb-4">
+                  🎯 Only after submitting will your score appear on the leaderboard!
+                </p>
                 {!scoreSubmitted && (
                   <div className="mb-4">
                     <button

@@ -39,25 +39,34 @@ const Leaderboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const normalizeLevel = (level) => {
+      const l = String(level).toLowerCase().trim();
+      if (l === '1' || l === 'beginner') return 'beginner';
+      if (l === '2' || l === 'intermediate') return 'intermediate';
+      if (l === '3' || l === 'advanced') return 'advanced';
+      return null;
+    };
+
     const fetchLeaderboard = async () => {
       try {
-        const res = await fetch('http://localhost:5050/api/attempts/leaderboard');
+        const res = await fetch('http://localhost:5050/api/attempts/leaderboard'); // Ensure backend returns all attempts without limit
         const data = await res.json();
-        setBeginner(
-          data
-            .filter(e => String(e.level).toLowerCase() === '1' || String(e.level).toLowerCase() === 'beginner')
-            .sort((a, b) => b.accuracy - a.accuracy)
-        );
-        setIntermediate(
-          data
-            .filter(e => String(e.level).toLowerCase() === '2' || String(e.level).toLowerCase() === 'intermediate')
-            .sort((a, b) => b.accuracy - a.accuracy)
-        );
-        setAdvanced(
-          data
-            .filter(e => String(e.level).toLowerCase() === '3' || String(e.level).toLowerCase() === 'advanced')
-            .sort((a, b) => b.accuracy - a.accuracy)
-        );
+        console.log('Fetched leaderboard data:', data);
+
+        const grouped = {
+          beginner: [],
+          intermediate: [],
+          advanced: [],
+        };
+
+        data.forEach((e) => {
+          const group = normalizeLevel(e.level);
+          if (group) grouped[group].push(e);
+        });
+
+        setBeginner(grouped.beginner.sort((a, b) => b.accuracy - a.accuracy));
+        setIntermediate(grouped.intermediate.sort((a, b) => b.accuracy - a.accuracy));
+        setAdvanced(grouped.advanced.sort((a, b) => b.accuracy - a.accuracy));
       } catch (err) {
         console.error('Failed to fetch leaderboard data:', err);
       }

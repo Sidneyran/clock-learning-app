@@ -31,6 +31,7 @@ const ReviewPage = () => {
         });
         const data = await response.json();
         const practiceOnly = (data || []).filter(item => item.mode === 'practice');
+        console.log('Practice Attempts:', practiceOnly);
         const latest = [...practiceOnly].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 20);
         setRecords(latest);
 
@@ -140,7 +141,9 @@ const ReviewPage = () => {
               {records.map((r, i) => (
                 <tr key={i}>
                   <td className="p-2 border text-center">{new Date(r.timestamp).toLocaleString()}</td>
-                  <td className="p-2 border text-center">{r.level}</td>
+                  <td className="p-2 border text-center">
+                    {r.level === 1 ? 'Beginner' : r.level === 2 ? 'Intermediate' : 'Advanced'}
+                  </td>
                   <td className="p-2 border text-center">{r.score >= r.total / 2 ? '✅' : '❌'}</td>
                   <td className="p-2 border text-center">{r.score}</td>
                 </tr>
